@@ -234,7 +234,7 @@ void loop(){
 
 ### 데모
 [![video](http://img.youtube.com/vi/G_TavM1EVMw/0.jpg)](http://www.youtube.com/watch?v=G_TavM1EVMw "video")
-- 해당 영상에 사용된 데모 예제코드는 example.ino 참조
+- 해당 영상에 사용된 데모 예제코드는 DCMIndicatorTest.ino 참조
 ---
 
 ## TODO
