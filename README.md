@@ -107,6 +107,9 @@ sequenceDiagram
 
     Note over M,D: idle 복귀
 ```
+## 실제 데이터 캡처
+<img width="1423" height="427" alt="image" src="https://github.com/user-attachments/assets/98b44354-94d0-4cae-87a0-f1693f51bd81" />
+
 
 ### 테스트된 타이밍
 
