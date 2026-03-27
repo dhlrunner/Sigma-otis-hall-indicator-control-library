@@ -202,13 +202,22 @@ sequenceDiagram
 
 ### 배선
 
-```
-Arduino D2  →  DCM Pin 3 (DATA)
-Arduino D3  →  DCM Pin 4 (CLK)
-Arduino D4  →  DCM Pin 5 (ENABLE)
-Arduino GND →  DCM Pin 2 (GND)
-별도 24V    →  DCM Pin 1 (DC24V)
-```
+#### Arduino
+|핀 | 접속대상 |
+|---|-------|
+| D2 | DCM Pin 3 (DATA) |
+| D3 | DCM Pin 4 (CLK) |
+| D4 | DCM Pin 5 (ENABLE) |
+| GND | 외부 24V 전원 GND |
+
+#### DCM-102N
+|핀 | 접속대상 |
+|---|-------|
+| 1 | 외부 24V 전원 + |
+| 2 | 외부 24V 전원 GND |
+| 3 | Arduino D2 |
+| 4 | Arduino D3 |
+| 5 | Arduino D4 |
 
 ### 사용 예시
 
