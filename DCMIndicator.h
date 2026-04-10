@@ -25,8 +25,8 @@ public:
   void clear();
 
   //Send raw data frame
-  //lamp: (6 bit) Overload(만원), Out of service(점검중), Arrow Up/Dn 등 
-  //left: (11 bit) First dot matrix 
+  //lamp: (6 bit) Overload(만원), Out of service(점검중), Arrow Up/Dn 등
+  //left: (11 bit) First dot matrix
   //right: (8 bit) Second dot matrix
   void DCMIndicator::sendRawFrame(uint8_t lamp, uint16_t left, uint8_t right);
 
@@ -69,7 +69,7 @@ private:
   uint8_t _lampByte = 0;
   uint16_t _leftSegByte = 0; //11-bit
   uint8_t _rightSegByte = 0;
-  
+
   void _pinAssert(uint8_t pin);
   void _pinDeassert(uint8_t pin);
   void _pinWrite(uint8_t pin, uint8_t bit);
@@ -79,5 +79,6 @@ private:
   void _commit();
   void _clearDataBuffer();
   void _sendCurrentData();
-  uint8_t _getAsciiCodeData(char c);
+  uint16_t _getAsciiCodeDataLeft(char c);
+  uint8_t _getAsciiCodeDataRight(char c);
 };

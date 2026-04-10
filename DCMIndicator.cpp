@@ -4,10 +4,10 @@ constexpr uint8_t DCMIndicator::_numbers[10];
 
 DCMIndicator::DCMIndicator(uint8_t pinData, uint8_t pinClk, uint8_t pinEn,
                            uint16_t halfUs, uint16_t enPulseUs)
-  : _pinData(pinData), _pinClk(pinClk), _pinEn(pinEn),
-    _halfUs(halfUs), _enPulseUs(enPulseUs)
+: _pinData(pinData), _pinClk(pinClk), _pinEn(pinEn),
+_halfUs(halfUs), _enPulseUs(enPulseUs)
 {
-  
+
 }
 
 //초기화
@@ -32,6 +32,10 @@ void DCMIndicator::_pinDeassert(uint8_t pin) {
   //핀 해제
   pinMode(pin, INPUT);
 }
+
+// 기존 오픈 컬렉터와 반대
+//void DCMIndicator::_pinAssert(uint8_t pin)   { pinMode(pin, OUTPUT); digitalWrite(pin, HIGH); } // NPN ON → LOW
+//void DCMIndicator::_pinDeassert(uint8_t pin) { pinMode(pin, OUTPUT); digitalWrite(pin, LOW);  } // NPN OFF → HIGH
 
 void DCMIndicator::_pinWrite(uint8_t pin, uint8_t bit) {
   if (bit) _pinDeassert(pin);
@@ -60,7 +64,7 @@ void DCMIndicator::_shiftBits(uint32_t data, uint8_t nbits) {
   }
 }
 
-//EN LOW로 주면 커밋됨 (받은 데이터 도트에 표시) 
+//EN LOW로 주면 커밋됨 (받은 데이터 도트에 표시)
 void DCMIndicator::_commit() {
   //CLK 복귀
   _pinAssert(_pinClk);
@@ -81,12 +85,12 @@ void DCMIndicator::_sendCurrentData(){
   sendRawFrame(_lampByte, _leftSegByte, _rightSegByte);
 }
 
-//ascii to hex bit convert helper
-uint8_t DCMIndicator::_getAsciiCodeData(char c) {
+//ascii to hex bit convert helper (left digit)
+uint16_t DCMIndicator::_getAsciiCodeDataLeft(char c) {
   switch (c) {
-    
+
     case '0': return 0x3F;
-    case '1': return 0x30;
+    case '1': return 0b00000000110;
     case '2': return 0xDB;
     case '3': return 0xCF;
     case '4': return 0xE6;
@@ -95,9 +99,9 @@ uint8_t DCMIndicator::_getAsciiCodeData(char c) {
     case '7': return 0x27;
     case '8': return 0xFF;
     case '9': return 0xEF;
-    
+
     case 'A': return 0xF7;
-    case 'B': return 0x490;
+    case 'B': return 0x4FF;
     case 'C': return 0x39;
     case 'D': return 0x89;
     case 'E': return 0xF9;
@@ -108,6 +112,7 @@ uint8_t DCMIndicator::_getAsciiCodeData(char c) {
     case 'J': return 0x1E;
     case 'K': return 0x05;
     case 'L': return 0x38;
+    case 'M': return 0x236;
     case 'N': return 0x09;
     case 'O': return 0x11;
     case 'P': return 0xF3;
@@ -133,6 +138,7 @@ uint8_t DCMIndicator::_getAsciiCodeData(char c) {
     case 'i': return 0x14;
     case 'j': return 0x24;
     case 'k': return 0x44;
+    case 'l': return 0x01; // same as I
     case 'm': return 0x84;
     case 'n': return 0x0D;
     case 'o': return 0xDC;
@@ -143,9 +149,92 @@ uint8_t DCMIndicator::_getAsciiCodeData(char c) {
     case 't': return 0x90;
     case 'u': return 0x1C;
     case 'v': return 0xA0;
+    case 'w': return 0xE0;
     case 'x': return 0xA4;
     case 'y': return 0x64;
     case 'z': return 0x2C;
+
+    case '-': return 0xC0;
+    default:  return 0x00;
+  }
+}
+
+//ascii to hex bit convert helper (right digit)
+uint8_t DCMIndicator::_getAsciiCodeDataRight(char c) {
+  switch (c) {
+
+    case '0': return 0x3F;
+    case '1': return 0x30;
+    case '2': return 0xDB;
+    case '3': return 0xCF;
+    case '4': return 0xE6;
+    case '5': return 0xED;
+    case '6': return 0xFD;
+    case '7': return 0x27;
+    case '8': return 0xFF;
+    case '9': return 0xEF;
+
+    case 'A': return 0xF7;
+    case 'B': return 0x49;
+    case 'C': return 0x39;
+    case 'D': return 0x89;
+    case 'E': return 0xF9;
+    case 'F': return 0xF1;
+    case 'G': return 0xBD;
+    case 'H': return 0xF6;
+    case 'I': return 0x01;
+    case 'J': return 0x1E;
+    case 'K': return 0x05;
+    case 'L': return 0x38;
+    //case 'M': return 0x236;
+    case 'N': return 0x09;
+    case 'O': return 0x11;
+    case 'P': return 0xF3;
+    case 'Q': return 0x21;
+    case 'R': return 0xB7;
+    case 'S': return 0x41;
+    case 'T': return 0x81;
+    case 'U': return 0x3E;
+    case 'V': return 0x0F;
+    case 'W': return 0x13;
+    case 'X': return 0x0A;
+    case 'Y': return 0x12;
+    case 'Z': return 0x22;
+
+    case 'a': return 0xDF;
+    case 'b': return 0xFC;
+    case 'c': return 0xD8;
+    case 'd': return 0xDE;
+    case 'e': return 0xBB;
+    case 'f': return 0x71;
+    case 'g': return 0x0C;
+    case 'h': return 0xF4;
+    case 'i': return 0x14;
+    case 'j': return 0x24;
+    case 'k': return 0x44;
+    case 'l': return 0x01; // same as I
+    case 'm': return 0x84;
+    case 'n': return 0x0D;
+    case 'o': return 0xDC;
+    case 'p': return 0x28;
+    case 'q': return 0x48;
+    case 'r': return 0xD0;
+    case 's': return 0x50;
+    case 't': return 0x90;
+    case 'u': return 0x1C;
+    case 'v': return 0xA0;
+    case 'w': return 0xE0;
+    case 'x': return 0xA4;
+    case 'y': return 0x64;
+    case 'z': return 0x2C;
+
+    //case '-': return 0xC0;
+
+    //special:
+    //25 하단중앙 점
+    //45 상하좌우 점 반복 표시 애니메이션
+    //A5 좌측중앙 점
+    //C5 우측중앙 점
     default:  return 0x00;
   }
 }
@@ -184,7 +273,7 @@ void DCMIndicator::setArrowClear(){
 void DCMIndicator::setArrowAnimation(bool set){
   if (set) {
     _lampByte |= (1 << 4);
-  } 
+  }
   else {
     _lampByte &= ~(1 << 4);
   }
@@ -195,7 +284,7 @@ void DCMIndicator::setArrowAnimation(bool set){
 void DCMIndicator::setArrowAnimationFast(bool set){
   if (!set) {
     _lampByte |= (1 << 5);
-  } 
+  }
   else {
     _lampByte &= ~(1 << 5);
   }
@@ -206,7 +295,7 @@ void DCMIndicator::setArrowAnimationFast(bool set){
 void DCMIndicator::setOverloadLamp(bool set){
   if (set) {
     _lampByte |= (1 << 2);
-  } 
+  }
   else {
     _lampByte &= ~(1 << 2);
   }
@@ -217,7 +306,7 @@ void DCMIndicator::setOverloadLamp(bool set){
 void DCMIndicator::setOutOfServiceLamp(bool set){
   if (set) {
     _lampByte |= (1 << 3);
-  } 
+  }
   else {
     _lampByte &= ~(1 << 3);
   }
@@ -244,8 +333,8 @@ void DCMIndicator::setFloor(int8_t floor){
 //WIP, Set Ascii code to dot
 //NULL to skip setting
 void DCMIndicator::setAscii(char left, char right){
-  if(left != NULL) _leftSegByte = _getAsciiCodeData(left);
-  if(right != NULL) _rightSegByte = _getAsciiCodeData(right);
+  if(left != NULL) _leftSegByte = _getAsciiCodeDataLeft(left);
+  if(right != NULL) _rightSegByte = _getAsciiCodeDataRight(right);
   _sendCurrentData();
 }
 
